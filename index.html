@@ -1,0 +1,1676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Hospital Appointment System | Smart Healthcare. Easy Appointments.</title>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <!-- Bootstrap Icons & FontAwesome -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <style>
+    :root {
+      --primary-navy: #0f2c59;
+      --primary-teal: #00a896;
+      --primary-teal-dark: #008080;
+      --accent-soft-blue: #eef5ff;
+      --accent-light-bg: #f8fafc;
+      --text-dark: #1e293b;
+      --text-muted: #64748b;
+      --card-shadow: 0 10px 30px rgba(15, 44, 89, 0.08);
+      --card-hover-shadow: 0 20px 40px rgba(0, 168, 150, 0.15);
+      --transition-smooth: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+      color: var(--text-dark);
+      background-color: var(--accent-light-bg);
+      overflow-x: hidden;
+    }
+
+    /* Navbar styling */
+    .navbar-custom {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+      transition: var(--transition-smooth);
+    }
+
+    .nav-link {
+      font-weight: 500;
+      color: var(--primary-navy) !important;
+      padding: 0.5rem 1rem !important;
+      transition: var(--transition-smooth);
+    }
+
+    .nav-link:hover, .nav-link.active {
+      color: var(--primary-teal) !important;
+    }
+
+    .btn-teal {
+      background-color: var(--primary-teal);
+      color: #fff;
+      font-weight: 600;
+      border-radius: 50px;
+      padding: 0.6rem 1.6rem;
+      border: none;
+      transition: var(--transition-smooth);
+      box-shadow: 0 4px 15px rgba(0, 168, 150, 0.3);
+    }
+
+    .btn-teal:hover {
+      background-color: var(--primary-teal-dark);
+      color: #fff;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 168, 150, 0.4);
+    }
+
+    .btn-navy {
+      background-color: var(--primary-navy);
+      color: #fff;
+      font-weight: 600;
+      border-radius: 50px;
+      padding: 0.6rem 1.6rem;
+      border: none;
+      transition: var(--transition-smooth);
+    }
+
+    .btn-navy:hover {
+      background-color: #1a3e75;
+      color: #fff;
+      transform: translateY(-2px);
+    }
+
+    .btn-outline-navy {
+      border: 2px solid var(--primary-navy);
+      color: var(--primary-navy);
+      font-weight: 600;
+      border-radius: 50px;
+      padding: 0.5rem 1.4rem;
+      transition: var(--transition-smooth);
+    }
+
+    .btn-outline-navy:hover {
+      background-color: var(--primary-navy);
+      color: #fff;
+    }
+
+    /* Card Utilities */
+    .card-custom {
+      border: none;
+      border-radius: 20px;
+      background: #ffffff;
+      box-shadow: var(--card-shadow);
+      transition: var(--transition-smooth);
+    }
+
+    .card-custom:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--card-hover-shadow);
+    }
+
+    .section-padding {
+      padding: 80px 0;
+    }
+
+    .section-title {
+      font-weight: 800;
+      color: var(--primary-navy);
+      margin-bottom: 15px;
+    }
+
+    .section-subtitle {
+      color: var(--primary-teal);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      font-size: 0.875rem;
+    }
+
+    /* Stat Cards */
+    .stat-card {
+      padding: 30px;
+      border-radius: 20px;
+      background: white;
+      box-shadow: var(--card-shadow);
+      border-left: 5px solid var(--primary-teal);
+      transition: var(--transition-smooth);
+    }
+
+    .stat-card:hover {
+      transform: translateY(-4px);
+    }
+
+    /* Badge styles */
+    .badge-pending { background-color: #ffc107; color: #000; }
+    .badge-confirmed { background-color: #0d6efd; color: #fff; }
+    .badge-cancelled { background-color: #dc3545; color: #fff; }
+    .badge-completed { background-color: #198754; color: #fff; }
+
+    /* Dashboard Sidebar */
+    .sidebar {
+      background: var(--primary-navy);
+      min-height: calc(100vh - 76px);
+      color: white;
+      border-radius: 0 24px 24px 0;
+      padding-top: 20px;
+    }
+
+    .sidebar-link {
+      color: rgba(255, 255, 255, 0.75);
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      font-weight: 500;
+      border-radius: 12px;
+      margin: 4px 16px;
+      transition: var(--transition-smooth);
+    }
+
+    .sidebar-link:hover, .sidebar-link.active {
+      color: white;
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    /* AI Widget Floating Window */
+    .ai-widget-button {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      z-index: 1050;
+      background: linear-gradient(135deg, var(--primary-navy), var(--primary-teal));
+      color: white;
+      border: none;
+      border-radius: 50px;
+      padding: 14px 24px;
+      font-weight: 700;
+      box-shadow: 0 10px 25px rgba(0, 168, 150, 0.4);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: var(--transition-smooth);
+      cursor: pointer;
+    }
+
+    .ai-widget-button:hover {
+      transform: scale(1.05) translateY(-3px);
+      box-shadow: 0 15px 30px rgba(0, 168, 150, 0.5);
+      color: white;
+    }
+
+    .ai-chat-window {
+      position: fixed;
+      bottom: 95px;
+      right: 30px;
+      width: 380px;
+      max-width: calc(100vw - 40px);
+      height: 520px;
+      background: white;
+      border-radius: 24px;
+      box-shadow: 0 20px 50px rgba(15, 44, 89, 0.25);
+      z-index: 1050;
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+      border: 1px solid rgba(0,0,0,0.08);
+      animation: popupSlide 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes popupSlide {
+      from { opacity: 0; transform: translateY(30px) scale(0.95); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .ai-chat-header {
+      background: linear-gradient(135deg, var(--primary-navy), #1e3a8a);
+      color: white;
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .ai-chat-body {
+      flex: 1;
+      padding: 16px;
+      overflow-y: auto;
+      background-color: #f8fafc;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .chat-bubble {
+      max-width: 82%;
+      padding: 12px 16px;
+      border-radius: 18px;
+      font-size: 0.9rem;
+      line-height: 1.4;
+    }
+
+    .chat-bubble-bot {
+      background: white;
+      color: var(--text-dark);
+      border-bottom-left-radius: 4px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      align-self: flex-start;
+      border: 1px solid #e2e8f0;
+    }
+
+    .chat-bubble-user {
+      background: var(--primary-teal);
+      color: white;
+      border-bottom-right-radius: 4px;
+      align-self: flex-end;
+    }
+
+    .quick-pill {
+      font-size: 0.78rem;
+      background: white;
+      border: 1px solid var(--primary-teal);
+      color: var(--primary-teal);
+      border-radius: 20px;
+      padding: 5px 12px;
+      cursor: pointer;
+      transition: var(--transition-smooth);
+      white-space: nowrap;
+    }
+
+    .quick-pill:hover {
+      background: var(--primary-teal);
+      color: white;
+    }
+
+    /* Page View Display Logic */
+    .page-view {
+      display: none;
+    }
+
+    .page-view.active {
+      display: block;
+      animation: fadeIn 0.4s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Hero Section Styling */
+    .hero-section {
+      background: linear-gradient(135deg, #eef5ff 0%, #ffffff 100%);
+      padding: 100px 0 80px;
+      position: relative;
+    }
+
+    .hero-img {
+      border-radius: 30px;
+      box-shadow: var(--card-shadow);
+      max-height: 480px;
+      object-fit: cover;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar navbar-expand-lg navbar-custom sticky-top">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-center gap-2" href="#" onclick="switchView('home')">
+        <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 42px; height: 42px; background: linear-gradient(135deg, var(--primary-navy), var(--primary-teal)) !important;">
+          <i class="fa-solid fa-hospital fs-5"></i>
+        </div>
+        <div>
+          <span class="fw-bold text-navy fs-5 d-block leading-tight" style="color: var(--primary-navy);">AI Health</span>
+          <small class="text-muted d-block" style="font-size: 0.68rem; margin-top: -4px;">Appointment System</small>
+        </div>
+      </a>
+      
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav mx-auto">
+          <li class="nav-item"><a class="nav-link active" id="nav-home" href="#" onclick="switchView('home')">Home</a></li>
+          <li class="nav-item"><a class="nav-link" id="nav-about" href="#" onclick="switchView('about')">About</a></li>
+          <li class="nav-item"><a class="nav-link" id="nav-departments" href="#" onclick="switchView('departments')">Departments</a></li>
+          <li class="nav-item"><a class="nav-link" id="nav-doctors" href="#" onclick="switchView('doctors')">Doctors</a></li>
+          <li class="nav-item"><a class="nav-link" id="nav-appointment" href="#" onclick="switchView('appointment')">Book Appointment</a></li>
+          <li class="nav-item"><a class="nav-link" id="nav-contact" href="#" onclick="switchView('contact')">Contact</a></li>
+        </ul>
+
+        <div class="d-flex gap-2 align-items-center">
+          <button class="btn btn-outline-navy" onclick="openArchModal()"><i class="fa-solid fa-diagram-project me-1"></i> Tech Stack</button>
+          <div class="dropdown" id="userMenuDropdown">
+            <button class="btn btn-navy dropdown-toggle" type="button" data-bs-toggle="dropdown" id="loginMenuBtn">
+              <i class="fa-solid fa-user me-1"></i> Access Portal
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-4 p-2">
+              <li><a class="dropdown-item rounded-3" href="#" onclick="switchView('login')"><i class="fa-solid fa-right-to-bracket text-primary me-2"></i>Login</a></li>
+              <li><a class="dropdown-item rounded-3" href="#" onclick="switchView('register')"><i class="fa-solid fa-user-plus text-success me-2"></i>Register</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><span class="dropdown-header text-uppercase fs-xs">Direct Dashboards</span></li>
+              <li><a class="dropdown-item rounded-3" href="#" onclick="switchDashboard('patient')"><i class="fa-solid fa-hospital-user me-2 text-info"></i>Patient Portal</a></li>
+              <li><a class="dropdown-item rounded-3" href="#" onclick="switchDashboard('doctor')"><i class="fa-solid fa-user-doctor me-2 text-primary"></i>Doctor Dashboard</a></li>
+              <li><a class="dropdown-item rounded-3" href="#" onclick="switchDashboard('admin')"><i class="fa-solid fa-user-shield me-2 text-warning"></i>Admin Control</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <main id="app-content">
+
+    <!-- VIEW 1: HOME PAGE -->
+    <section id="view-home" class="page-view active">
+      <!-- Hero -->
+      <div class="hero-section">
+        <div class="container">
+          <div class="row align-items-center g-5">
+            <div class="col-lg-6">
+              <span class="badge rounded-pill px-3 py-2 text-teal fw-bold mb-3" style="background: rgba(0,168,150,0.12); color: var(--primary-teal);">
+                <i class="fa-solid fa-sparkles me-1"></i> Powered by Microsoft Copilot Studio
+              </span>
+              <h1 class="display-4 fw-extrabold text-navy mb-3" style="color: var(--primary-navy); font-weight: 800;">
+                Your Health, <br><span style="color: var(--primary-teal);">Our Priority</span>
+              </h1>
+              <p class="lead text-muted mb-4">
+                Book an appointment with trusted specialist doctors quickly and effortlessly using our intelligent AI healthcare management system.
+              </p>
+              <div class="d-flex flex-wrap gap-3">
+                <button class="btn btn-teal btn-lg" onclick="switchView('appointment')">
+                  <i class="fa-solid fa-calendar-check me-2"></i>Book Appointment
+                </button>
+                <button class="btn btn-outline-navy btn-lg" onclick="switchView('doctors')">
+                  <i class="fa-solid fa-user-md me-2"></i>Find a Doctor
+                </button>
+              </div>
+              
+              <div class="row mt-5 pt-3 g-3 border-top">
+                <div class="col-4">
+                  <h3 class="fw-bold mb-0 text-navy" style="color: var(--primary-navy);">50+</h3>
+                  <small class="text-muted">Expert Doctors</small>
+                </div>
+                <div class="col-4">
+                  <h3 class="fw-bold mb-0 text-teal" style="color: var(--primary-teal);">10+</h3>
+                  <small class="text-muted">Departments</small>
+                </div>
+                <div class="col-4">
+                  <h3 class="fw-bold mb-0 text-navy" style="color: var(--primary-navy);">10k+</h3>
+                  <small class="text-muted">Happy Patients</small>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-lg-6 text-center">
+              <div class="position-relative d-inline-block">
+                <img src="https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&w=800&q=80" alt="Hospital Doctor" class="img-fluid hero-img w-100" />
+                <div class="position-absolute bottom-0 start-0 bg-white p-3 rounded-4 shadow-lg mb-4 ms-n3 text-start d-none d-md-flex align-items-center gap-3" style="max-width: 260px;">
+                  <div class="bg-success text-white rounded-circle p-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                    <i class="fa-solid fa-clock"></i>
+                  </div>
+                  <div>
+                    <h6 class="mb-0 fw-bold">24/7 AI Booking</h6>
+                    <small class="text-muted fs-xs">Instant confirmations</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Services Highlights -->
+      <div class="section-padding bg-white">
+        <div class="container">
+          <div class="text-center mb-5">
+            <span class="section-subtitle">Comprehensive Healthcare</span>
+            <h2 class="section-title">Why Choose AI Health System?</h2>
+          </div>
+
+          <div class="row g-4">
+            <div class="col-md-4">
+              <div class="card card-custom p-4 text-center h-100">
+                <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center mx-auto mb-3" style="width: 70px; height: 70px; color: var(--primary-teal);">
+                  <i class="fa-solid fa-robot fs-2"></i>
+                </div>
+                <h5 class="fw-bold">AI Smart Scheduling</h5>
+                <p class="text-muted mb-0">Copilot Studio assistant guides you to available slots in seconds based on symptom queries.</p>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card card-custom p-4 text-center h-100">
+                <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center mx-auto mb-3" style="width: 70px; height: 70px; color: var(--primary-navy);">
+                  <i class="fa-solid fa-user-nurse fs-2"></i>
+                </div>
+                <h5 class="fw-bold">Verified Specialists</h5>
+                <p class="text-muted mb-0">Access top medical specialists across Cardiology, Neurology, Pediatrics, and Orthopedics.</p>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card card-custom p-4 text-center h-100">
+                <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center mx-auto mb-3" style="width: 70px; height: 70px; color: var(--primary-teal);">
+                  <i class="fa-solid fa-shield-halved fs-2"></i>
+                </div>
+                <h5 class="fw-bold">Instant Notifications</h5>
+                <p class="text-muted mb-0">Automated Microsoft Power Automate workflow sends real-time email confirmation reminders.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 2: ABOUT PAGE -->
+    <section id="view-about" class="page-view section-padding">
+      <div class="container">
+        <div class="row align-items-center g-5">
+          <div class="col-lg-6">
+            <img src="https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=800&q=80" alt="Hospital Interior" class="img-fluid rounded-4 shadow-lg" />
+          </div>
+          <div class="col-lg-6">
+            <span class="section-subtitle">About Our Hospital</span>
+            <h2 class="section-title">Leading the Future of Modern Patient-Centered Care</h2>
+            <p class="text-muted">
+              AI Hospital Appointment System provides world-class clinical care integrated with next-generation digital booking workflows. Our mission is to remove waiting room stress and optimize care delivery for every patient.
+            </p>
+            <ul class="list-unstyled d-flex flex-column gap-3 mb-4">
+              <li class="d-flex align-items-center gap-3">
+                <i class="fa-solid fa-circle-check text-success fs-5"></i>
+                <span class="fw-semibold">50+ Highly Qualified Board-Certified Physicians</span>
+              </li>
+              <li class="d-flex align-items-center gap-3">
+                <i class="fa-solid fa-circle-check text-success fs-5"></i>
+                <span class="fw-semibold">10 Dedicated Specialized Clinical Departments</span>
+              </li>
+              <li class="d-flex align-items-center gap-3">
+                <i class="fa-solid fa-circle-check text-success fs-5"></i>
+                <span class="fw-semibold">Integrated Microsoft AI Ecosystem & Power Automate Alerts</span>
+              </li>
+            </ul>
+            <button class="btn btn-navy" onclick="switchView('doctors')">Explore Our Medical Team</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 3: DEPARTMENTS PAGE -->
+    <section id="view-departments" class="page-view section-padding">
+      <div class="container">
+        <div class="text-center mb-5">
+          <span class="section-subtitle">Clinical Specialties</span>
+          <h2 class="section-title">Hospital Departments</h2>
+          <p class="text-muted mx-auto" style="max-width: 600px;">Explore our specialized departments equipped with state-of-the-art diagnostic technology.</p>
+        </div>
+
+        <div class="row g-4" id="departments-grid">
+          <!-- Dynamic department cards inserted via JavaScript -->
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 4: DOCTORS DIRECTORY -->
+    <section id="view-doctors" class="page-view section-padding">
+      <div class="container">
+        <div class="text-center mb-4">
+          <span class="section-subtitle">Medical Staff</span>
+          <h2 class="section-title">Find Your Specialist</h2>
+        </div>
+
+        <!-- Filter & Search Bar -->
+        <div class="card card-custom p-4 mb-5">
+          <div class="row g-3 align-items-center">
+            <div class="col-md-5">
+              <div class="input-group">
+                <span class="input-group-text bg-white border-end-0"><i class="fa-solid fa-magnifying-glass text-muted"></i></span>
+                <input type="text" id="doctor-search-input" class="form-control border-start-0" placeholder="Search doctor by name or specialty..." onkeyup="filterDoctors()" />
+              </div>
+            </div>
+            <div class="col-md-4">
+              <select id="doctor-dept-filter" class="form-select" onchange="filterDoctors()">
+                <option value="all">All Departments</option>
+                <option value="Cardiology">Cardiology</option>
+                <option value="Neurology">Neurology</option>
+                <option value="Orthopedics">Orthopedics</option>
+                <option value="Pediatrics">Pediatrics</option>
+                <option value="Dermatology">Dermatology</option>
+                <option value="General Medicine">General Medicine</option>
+                <option value="Dental">Dental</option>
+                <option value="ENT">ENT</option>
+              </select>
+            </div>
+            <div class="col-md-3">
+              <select id="doctor-avail-filter" class="form-select" onchange="filterDoctors()">
+                <option value="all">All Availability</option>
+                <option value="Available">Available Today</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="row g-4" id="doctors-grid">
+          <!-- Dynamic doctors directory inserted via JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 5: APPOINTMENT BOOKING PAGE -->
+    <section id="view-appointment" class="page-view section-padding">
+      <div class="container" style="max-width: 850px;">
+        <div class="card card-custom p-4 p-md-5">
+          <div class="text-center mb-4">
+            <span class="section-subtitle">Quick Booking</span>
+            <h2 class="section-title">Book an Appointment</h2>
+            <p class="text-muted">Select department, doctor, and preferred time slot for instant confirmation.</p>
+          </div>
+
+          <form id="booking-form" onsubmit="handleAppointmentSubmit(event)">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Patient Name</label>
+                <input type="text" id="book-patient-name" class="form-control" placeholder="e.g. Sok Visal" required />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Phone Number</label>
+                <input type="tel" id="book-patient-phone" class="form-control" placeholder="+855 12 345 678" required />
+              </div>
+              <div class="col-md-12">
+                <label class="form-label fw-semibold">Email Address (For Confirmation Alerts)</label>
+                <input type="email" id="book-patient-email" class="form-control" placeholder="patient@example.com" required />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Department</label>
+                <select id="book-dept-select" class="form-select" onchange="updateDoctorDropdown()" required>
+                  <option value="">Choose Department...</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Doctor</label>
+                <select id="book-doctor-select" class="form-select" required>
+                  <option value="">Choose Doctor...</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Preferred Date</label>
+                <input type="date" id="book-date" class="form-control" required />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Time Slot</label>
+                <select id="book-time-select" class="form-select" required>
+                  <option value="08:00 AM - 09:00 AM">08:00 AM - 09:00 AM</option>
+                  <option value="09:00 AM - 10:00 AM">09:00 AM - 10:00 AM</option>
+                  <option value="10:30 AM - 11:30 AM">10:30 AM - 11:30 AM</option>
+                  <option value="02:00 PM - 03:00 PM">02:00 PM - 03:00 PM</option>
+                  <option value="03:30 PM - 04:30 PM">03:30 PM - 04:30 PM</option>
+                </select>
+              </div>
+              <div class="col-12">
+                <label class="form-label fw-semibold">Reason for Visit / Symptoms</label>
+                <textarea id="book-reason" class="form-control" rows="3" placeholder="Briefly describe your symptoms or visit purpose..."></textarea>
+              </div>
+              <div class="col-12 mt-4 text-center">
+                <button type="submit" class="btn btn-teal btn-lg w-100">
+                  <i class="fa-solid fa-check-circle me-2"></i> Confirm & Book Appointment
+                </button>
+              </div>
+            </div>
+          </form>
+
+          <!-- Success Alert Container -->
+          <div id="booking-confirmation-card" class="mt-4 p-4 rounded-4 bg-success bg-opacity-10 border border-success d-none">
+            <div class="text-center">
+              <i class="fa-solid fa-circle-check text-success fs-1 mb-2"></i>
+              <h4 class="fw-bold text-success">Appointment Confirmed!</h4>
+              <p class="mb-3 text-muted">Your appointment request has been recorded and synchronized across dashboards.</p>
+              <div class="card p-3 bg-white text-start shadow-sm mx-auto mb-3" style="max-width: 450px;">
+                <p class="mb-1"><strong>Appointment ID:</strong> <span id="conf-id">#APT-101</span></p>
+                <p class="mb-1"><strong>Doctor:</strong> <span id="conf-doctor">Dr. Sok Dara</span></p>
+                <p class="mb-1"><strong>Date & Time:</strong> <span id="conf-datetime">Oct 1, 2026 | 09:00 AM</span></p>
+                <p class="mb-0"><strong>Status:</strong> <span class="badge badge-pending">Pending Doctor Review</span></p>
+              </div>
+              <button class="btn btn-navy me-2" onclick="switchDashboard('patient')">View in Patient Dashboard</button>
+              <button class="btn btn-outline-secondary" onclick="resetBookingForm()">Book Another</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 6: CONTACT PAGE -->
+    <section id="view-contact" class="page-view section-padding">
+      <div class="container">
+        <div class="row g-5">
+          <div class="col-lg-5">
+            <span class="section-subtitle">Get In Touch</span>
+            <h2 class="section-title">Hospital Contact Details</h2>
+            <p class="text-muted">Have urgent clinical inquiries or need help with booking? Reach out to our emergency desk or reception.</p>
+            
+            <div class="d-flex align-items-center gap-3 mb-3 p-3 card-custom">
+              <i class="fa-solid fa-location-dot text-teal fs-3"></i>
+              <div>
+                <h6 class="mb-0 fw-bold">Address</h6>
+                <small class="text-muted">Monivong Blvd, Phnom Penh, Cambodia</small>
+              </div>
+            </div>
+            <div class="d-flex align-items-center gap-3 mb-3 p-3 card-custom">
+              <i class="fa-solid fa-phone text-teal fs-3"></i>
+              <div>
+                <h6 class="mb-0 fw-bold">Hotline / Emergency</h6>
+                <small class="text-muted">+855 (0) 23 888 999 (24/7)</small>
+              </div>
+            </div>
+            <div class="d-flex align-items-center gap-3 p-3 card-custom">
+              <i class="fa-solid fa-envelope text-teal fs-3"></i>
+              <div>
+                <h6 class="mb-0 fw-bold">Email Inquiries</h6>
+                <small class="text-muted">info@aihealthhospital.com</small>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-7">
+            <div class="card card-custom p-4">
+              <h4 class="fw-bold mb-3">Send Us a Direct Message</h4>
+              <form onsubmit="alert('Message sent successfully! Our desk will reply shortly.'); event.preventDefault();">
+                <div class="row g-3">
+                  <div class="col-md-6"><input type="text" class="form-control" placeholder="Your Name" required></div>
+                  <div class="col-md-6"><input type="email" class="form-control" placeholder="Your Email" required></div>
+                  <div class="col-12"><input type="text" class="form-control" placeholder="Subject"></div>
+                  <div class="col-12"><textarea class="form-control" rows="4" placeholder="Your Message..."></textarea></div>
+                  <div class="col-12"><button type="submit" class="btn btn-navy">Send Message</button></div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 7: AUTHENTICATION (LOGIN & REGISTER) -->
+    <section id="view-login" class="page-view section-padding">
+      <div class="container" style="max-width: 480px;">
+        <div class="card card-custom p-4 p-md-5">
+          <h3 class="fw-bold text-center mb-3">Portal Login</h3>
+          <p class="text-muted text-center fs-sm mb-4">Select your role to access management views.</p>
+          
+          <form onsubmit="handleLoginSubmit(event)">
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Select Role</label>
+              <select id="login-role-select" class="form-select">
+                <option value="patient">Patient</option>
+                <option value="doctor">Doctor</option>
+                <option value="admin">Administrator</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Email Address</label>
+              <input type="email" class="form-control" value="demo@aihealth.com" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Password</label>
+              <input type="password" class="form-control" value="••••••••" required>
+            </div>
+            <button type="submit" class="btn btn-teal w-100 mb-3">Login to Dashboard</button>
+          </form>
+          <div class="text-center">
+            <small class="text-muted">Don't have an account? <a href="#" onclick="switchView('register')">Register here</a></small>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="view-register" class="page-view section-padding">
+      <div class="container" style="max-width: 520px;">
+        <div class="card card-custom p-4 p-md-5">
+          <h3 class="fw-bold text-center mb-3">Patient Registration</h3>
+          <form onsubmit="alert('Registration complete! Please login.'); switchView('login'); event.preventDefault();">
+            <div class="mb-3"><label class="form-label fw-semibold">Full Name</label><input type="text" class="form-control" placeholder="Sok Dara" required></div>
+            <div class="mb-3"><label class="form-label fw-semibold">Email Address</label><input type="email" class="form-control" placeholder="sok@example.com" required></div>
+            <div class="mb-3"><label class="form-label fw-semibold">Phone Number</label><input type="tel" class="form-control" placeholder="+855 12 000 111" required></div>
+            <div class="mb-3"><label class="form-label fw-semibold">Password</label><input type="password" class="form-control" required></div>
+            <button type="submit" class="btn btn-navy w-100">Create Account</button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 8: DASHBOARDS MAIN CONTAINER -->
+    <section id="view-dashboards" class="page-view">
+      <div class="container-fluid p-0">
+        <div class="row g-0">
+          <!-- Sidebar -->
+          <div class="col-md-3 col-lg-2 sidebar">
+            <div class="px-3 mb-4 text-center">
+              <div id="dash-user-badge" class="badge bg-teal px-3 py-2 text-white mb-2">Patient Account</div>
+              <h6 class="mb-0 text-white fw-bold" id="dash-user-name">Sok Visal</h6>
+            </div>
+
+            <!-- Dynamic Sidebar links -->
+            <div id="sidebar-links"></div>
+          </div>
+
+          <!-- Dashboard Dynamic Content Area -->
+          <div class="col-md-9 col-lg-10 p-4 bg-light" style="min-height: calc(100vh - 76px);">
+            
+            <!-- PATIENT DASHBOARD CONTENT -->
+            <div id="dash-content-patient" class="dash-panel d-none">
+              <h3 class="fw-bold text-navy mb-4">Patient Portal Overview</h3>
+              
+              <div class="row g-4 mb-4">
+                <div class="col-md-4">
+                  <div class="stat-card">
+                    <small class="text-muted fw-bold">Upcoming Appointments</small>
+                    <h2 class="fw-bold text-navy mb-0" id="pat-stat-upcoming">0</h2>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="stat-card" style="border-color: #198754;">
+                    <small class="text-muted fw-bold">Completed Visits</small>
+                    <h2 class="fw-bold text-success mb-0" id="pat-stat-completed">0</h2>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="stat-card" style="border-color: #dc3545;">
+                    <small class="text-muted fw-bold">Cancelled</small>
+                    <h2 class="fw-bold text-danger mb-0" id="pat-stat-cancelled">0</h2>
+                  </div>
+                </div>
+              </div>
+
+              <!-- My Appointments Table -->
+              <div class="card card-custom p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <h5 class="fw-bold mb-0">My Appointments</h5>
+                  <button class="btn btn-sm btn-teal" onclick="switchView('appointment')"><i class="fa-solid fa-plus me-1"></i> New Booking</button>
+                </div>
+                <div class="table-responsive">
+                  <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                      <tr>
+                        <th>ID</th>
+                        <th>Doctor</th>
+                        <th>Department</th>
+                        <th>Date & Time</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody id="patient-appts-tbody">
+                      <!-- Dynamic Rows -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <!-- DOCTOR DASHBOARD CONTENT -->
+            <div id="dash-content-doctor" class="dash-panel d-none">
+              <h3 class="fw-bold text-navy mb-4">Doctor Clinical Dashboard</h3>
+              
+              <div class="row g-4 mb-4">
+                <div class="col-md-3">
+                  <div class="stat-card">
+                    <small class="text-muted fw-bold">Today's Appointments</small>
+                    <h2 class="fw-bold text-navy mb-0" id="doc-stat-today">0</h2>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="stat-card" style="border-color: #ffc107;">
+                    <small class="text-muted fw-bold">Pending Review</small>
+                    <h2 class="fw-bold text-warning mb-0" id="doc-stat-pending">0</h2>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="stat-card" style="border-color: #0d6efd;">
+                    <small class="text-muted fw-bold">Confirmed</small>
+                    <h2 class="fw-bold text-primary mb-0" id="doc-stat-confirmed">0</h2>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="stat-card" style="border-color: #198754;">
+                    <small class="text-muted fw-bold">Completed</small>
+                    <h2 class="fw-bold text-success mb-0" id="doc-stat-completed">0</h2>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card card-custom p-4">
+                <h5 class="fw-bold mb-3">Assigned Patient Appointments</h5>
+                <div class="table-responsive">
+                  <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                      <tr>
+                        <th>Patient</th>
+                        <th>Date & Time</th>
+                        <th>Reason</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody id="doctor-appts-tbody">
+                      <!-- Dynamic Doctor Rows -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <!-- ADMIN DASHBOARD CONTENT -->
+            <div id="dash-content-admin" class="dash-panel d-none">
+              <h3 class="fw-bold text-navy mb-4">Admin Control Center</h3>
+              
+              <!-- Stats -->
+              <div class="row g-4 mb-4">
+                <div class="col-md-3">
+                  <div class="stat-card">
+                    <small class="text-muted fw-bold">Total Patients</small>
+                    <h2 class="fw-bold text-navy mb-0" id="admin-stat-patients">1,240</h2>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="stat-card" style="border-color: #00a896;">
+                    <small class="text-muted fw-bold">Total Doctors</small>
+                    <h2 class="fw-bold text-teal mb-0" id="admin-stat-doctors">5</h2>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="stat-card" style="border-color: #6f42c1;">
+                    <small class="text-muted fw-bold">Departments</small>
+                    <h2 class="fw-bold text-purple mb-0" id="admin-stat-depts">8</h2>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="stat-card" style="border-color: #fd7e14;">
+                    <small class="text-muted fw-bold">Total Appointments</small>
+                    <h2 class="fw-bold text-warning mb-0" id="admin-stat-appts">0</h2>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Chart Visualizations -->
+              <div class="row g-4 mb-4">
+                <div class="col-lg-8">
+                  <div class="card card-custom p-4">
+                    <h6 class="fw-bold mb-3">Appointments Distribution by Department</h6>
+                    <canvas id="chart-depts" height="120"></canvas>
+                  </div>
+                </div>
+                <div class="col-lg-4">
+                  <div class="card card-custom p-4">
+                    <h6 class="fw-bold mb-3">Appointment Status Breakdown</h6>
+                    <canvas id="chart-status" height="200"></canvas>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Admin Management Sub-tabs -->
+              <div class="card card-custom p-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <h5 class="fw-bold mb-0">Doctor & Appointment Operations</h5>
+                  <button class="btn btn-sm btn-navy" onclick="openAddDoctorModal()"><i class="fa-solid fa-plus me-1"></i> Add Doctor</button>
+                </div>
+
+                <div class="table-responsive">
+                  <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                      <tr>
+                        <th>ID</th>
+                        <th>Patient</th>
+                        <th>Doctor</th>
+                        <th>Dept</th>
+                        <th>Date/Time</th>
+                        <th>Status</th>
+                        <th>Admin Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody id="admin-appts-tbody">
+                      <!-- Admin Dynamic Appts -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- MODAL: DOCTOR PROFILE DETAIL -->
+  <div class="modal fade" id="doctorDetailModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content border-0 rounded-4 shadow">
+        <div class="modal-header border-0 bg-navy text-white rounded-top-4" style="background: var(--primary-navy);">
+          <h5 class="modal-title fw-bold" id="doc-modal-title">Doctor Profile</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body p-4" id="doc-modal-body">
+          <!-- Dynamic contents -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: ADD / EDIT DOCTOR (ADMIN) -->
+  <div class="modal fade" id="addDoctorModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 rounded-4 shadow">
+        <div class="modal-header bg-teal text-white rounded-top-4" style="background: var(--primary-teal);">
+          <h5 class="modal-title fw-bold">Add New Doctor</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body p-4">
+          <form id="add-doctor-form" onsubmit="handleAddDoctor(event)">
+            <div class="mb-3"><label class="form-label">Doctor Name</label><input type="text" id="admin-doc-name" class="form-control" required placeholder="Dr. John Smith"></div>
+            <div class="mb-3">
+              <label class="form-label">Department</label>
+              <select id="admin-doc-dept" class="form-select" required>
+                <option value="Cardiology">Cardiology</option>
+                <option value="Neurology">Neurology</option>
+                <option value="Orthopedics">Orthopedics</option>
+                <option value="Pediatrics">Pediatrics</option>
+                <option value="Dermatology">Dermatology</option>
+                <option value="General Medicine">General Medicine</option>
+              </select>
+            </div>
+            <div class="mb-3"><label class="form-label">Specialty</label><input type="text" id="admin-doc-spec" class="form-control" required placeholder="Cardiologist"></div>
+            <div class="mb-3"><label class="form-label">Experience</label><input type="text" id="admin-doc-exp" class="form-control" required placeholder="8 Years"></div>
+            <button type="submit" class="btn btn-teal w-100">Save Doctor</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: ARCHITECTURE & TECH STACK MODAL -->
+  <div class="modal fade" id="archModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content border-0 rounded-4 shadow">
+        <div class="modal-header bg-navy text-white rounded-top-4" style="background: var(--primary-navy);">
+          <h5 class="modal-title fw-bold"><i class="fa-solid fa-diagram-project me-2"></i> System Architecture & Microsoft AI Integration</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body p-4">
+          <div class="text-center mb-4">
+            <span class="badge bg-teal px-3 py-2 text-white mb-2">Enterprise Ready Integration Pipeline</span>
+            <h5>End-to-End Microsoft Copilot Studio & Power Automate Flow</h5>
+          </div>
+
+          <!-- Workflow Steps Diagram -->
+          <div class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-2 text-center my-4 p-3 bg-light rounded-4">
+            <div class="p-2 border bg-white rounded-3 flex-fill shadow-sm">
+              <i class="fa-solid fa-user-check text-primary fs-3"></i>
+              <div class="fw-bold fs-xs mt-1">1. Patient Web Chat</div>
+            </div>
+            <i class="fa-solid fa-arrow-right d-none d-md-block text-muted"></i>
+            <div class="p-2 border bg-white rounded-3 flex-fill shadow-sm">
+              <i class="fa-solid fa-robot text-teal fs-3"></i>
+              <div class="fw-bold fs-xs mt-1">2. Copilot Studio</div>
+            </div>
+            <i class="fa-solid fa-arrow-right d-none d-md-block text-muted"></i>
+            <div class="p-2 border bg-white rounded-3 flex-fill shadow-sm">
+              <i class="fa-solid fa-bolt text-warning fs-3"></i>
+              <div class="fw-bold fs-xs mt-1">3. Power Automate</div>
+            </div>
+            <i class="fa-solid fa-arrow-right d-none d-md-block text-muted"></i>
+            <div class="p-2 border bg-white rounded-3 flex-fill shadow-sm">
+              <i class="fa-solid fa-code text-danger fs-3"></i>
+              <div class="fw-bold fs-xs mt-1">4. ASP.NET Core API</div>
+            </div>
+            <i class="fa-solid fa-arrow-right d-none d-md-block text-muted"></i>
+            <div class="p-2 border bg-white rounded-3 flex-fill shadow-sm">
+              <i class="fa-solid fa-database text-info fs-3"></i>
+              <div class="fw-bold fs-xs mt-1">5. SQL Server</div>
+            </div>
+          </div>
+
+          <div class="bg-primary bg-opacity-10 p-3 rounded-3 text-navy">
+            <h6 class="fw-bold"><i class="fa-solid fa-circle-info me-1"></i> API Configuration Note</h6>
+            <code class="d-block p-2 bg-dark text-white rounded mt-1">const API_BASE_URL = "https://localhost:7001/api";</code>
+            <small class="text-muted d-block mt-2">The frontend includes API wrapper hooks ready to communicate with ASP.NET Core controllers and trigger Power Automate webhooks for automated Microsoft Outlook appointment reminders.</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FLOATING AI ASSISTANT WIDGET -->
+  <button class="ai-widget-button" onclick="toggleAIChat()">
+    <i class="fa-solid fa-robot fs-4"></i>
+    <span>AI Assistant</span>
+  </button>
+
+  <div class="ai-chat-window" id="ai-chat-window">
+    <div class="ai-chat-header">
+      <div class="d-flex align-items-center gap-2">
+        <div class="bg-white text-teal rounded-circle p-1 d-flex align-items-center justify-content-center" style="width:32px; height:32px;">
+          <i class="fa-solid fa-bot fs-6" style="color: var(--primary-teal);"></i>
+        </div>
+        <div>
+          <h6 class="mb-0 fw-bold fs-sm">AI Hospital Assistant</h6>
+          <small class="text-white-50" style="font-size:0.7rem;">Microsoft Copilot Studio Mock</small>
+        </div>
+      </div>
+      <button class="btn-close btn-close-white" onclick="toggleAIChat()"></button>
+    </div>
+
+    <!-- Quick Actions Bar -->
+    <div class="bg-light p-2 border-bottom d-flex gap-1 overflow-x-auto" style="scrollbar-width: thin;">
+      <span class="quick-pill" onclick="sendQuickPill('Find a Doctor')">Find Doctor</span>
+      <span class="quick-pill" onclick="sendQuickPill('Check Availability')">Availability</span>
+      <span class="quick-pill" onclick="sendQuickPill('Book Appointment')">Book</span>
+      <span class="quick-pill" onclick="sendQuickPill('Hospital Info')">Hospital Info</span>
+    </div>
+
+    <div class="ai-chat-body" id="ai-chat-body">
+      <div class="chat-bubble chat-bubble-bot">
+        👋 Hello! I am your AI Healthcare Assistant. How can I assist with your appointments or doctor search today?
+      </div>
+    </div>
+
+    <div class="p-2 border-top bg-white">
+      <div class="input-group">
+        <input type="text" id="ai-chat-input" class="form-control form-control-sm" placeholder="Ask about doctors or book..." onkeypress="handleAIType(event)">
+        <button class="btn btn-teal btn-sm" onclick="sendAIMessage()"><i class="fa-solid fa-paper-plane"></i></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap 5 JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    /* ==========================================================================
+       API CONFIGURATION & DATA MODELS
+       ========================================================================== */
+    const API_BASE_URL = "https://localhost:7001/api";
+
+    // Initial Mock Hospital Data
+    const initialDepartments = [
+      { id: 1, name: "Cardiology", icon: "fa-heart-pulse", desc: "Expert care for heart disease, arrhythmia, and hypertension management." },
+      { id: 2, name: "Neurology", icon: "fa-brain", desc: "Advanced diagnosis for brain, spinal cord, and neuromuscular conditions." },
+      { id: 3, name: "Orthopedics", icon: "fa-bone", desc: "Specialized joint replacements, sports injury, and bone trauma care." },
+      { id: 4, name: "Pediatrics", icon: "fa-baby", desc: "Compassionate health and development care for newborns, kids, and teens." },
+      { id: 5, name: "Dermatology", icon: "fa-allergies", desc: "Comprehensive treatment for skin disorders, acne, and cosmetic dermatologic care." },
+      { id: 6, name: "General Medicine", icon: "fa-stethoscope", desc: "Primary health checkups, preventative care, and chronic illness diagnosis." },
+      { id: 7, name: "Dental", icon: "fa-tooth", desc: "Preventative dental health, orthodontics, and restorative oral surgery." },
+      { id: 8, name: "ENT", icon: "fa-ear-listen", desc: "Care for ear, nose, throat, and head & neck surgical conditions." }
+    ];
+
+    const initialDoctors = [
+      {
+        id: 101,
+        name: "Dr. Sok Dara",
+        specialty: "Cardiologist",
+        department: "Cardiology",
+        experience: "10 Years",
+        availability: "Available",
+        education: "MD, Cardiology - Harvard Medical",
+        languages: "English, Khmer",
+        photo: "https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&w=400&q=80"
+      },
+      {
+        id: 102,
+        name: "Dr. Elena Rostova",
+        specialty: "Neurologist",
+        department: "Neurology",
+        experience: "12 Years",
+        availability: "Available",
+        education: "MD, Neurology - Johns Hopkins",
+        languages: "English, Russian",
+        photo: "https://images.unsplash.com/photo-1594824813566-78a018780775?auto=format&fit=crop&w=400&q=80"
+      },
+      {
+        id: 103,
+        name: "Dr. Marcus Vance",
+        specialty: "Orthopedic Surgeon",
+        department: "Orthopedics",
+        experience: "8 Years",
+        availability: "Available",
+        education: "MD, Orthopedic Surgery",
+        languages: "English",
+        photo: "https://images.unsplash.com/photo-1537368910025-700350fe46c7?auto=format&fit=crop&w=400&q=80"
+      },
+      {
+        id: 104,
+        name: "Dr. Sarah Lin",
+        specialty: "Pediatrician",
+        department: "Pediatrics",
+        experience: "6 Years",
+        availability: "Available",
+        education: "MD, Pediatrics",
+        languages: "English, Mandarin",
+        photo: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&w=400&q=80"
+      },
+      {
+        id: 105,
+        name: "Dr. James Wilson",
+        specialty: "Dermatologist",
+        department: "Dermatology",
+        experience: "14 Years",
+        availability: "Available",
+        education: "MD, Dermatology",
+        languages: "English",
+        photo: "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?auto=format&fit=crop&w=400&q=80"
+      }
+    ];
+
+    const initialAppointments = [
+      {
+        id: "APT-1001",
+        patientName: "Sok Visal",
+        patientEmail: "visal@example.com",
+        doctorName: "Dr. Sok Dara",
+        department: "Cardiology",
+        date: "2026-10-02",
+        time: "09:00 AM - 10:00 AM",
+        reason: "Routine heart checkup",
+        status: "Confirmed"
+      },
+      {
+        id: "APT-1002",
+        patientName: "Chan Lina",
+        patientEmail: "lina@example.com",
+        doctorName: "Dr. Elena Rostova",
+        department: "Neurology",
+        date: "2026-10-03",
+        time: "10:30 AM - 11:30 AM",
+        reason: "Migraine consultation",
+        status: "Pending"
+      }
+    ];
+
+    // LocalStorage Initialization Function
+    function initData() {
+      if (!localStorage.getItem("ai_hosp_doctors")) {
+        localStorage.setItem("ai_hosp_doctors", JSON.stringify(initialDoctors));
+      }
+      if (!localStorage.getItem("ai_hosp_depts")) {
+        localStorage.setItem("ai_hosp_depts", JSON.stringify(initialDepartments));
+      }
+      if (!localStorage.getItem("ai_hosp_appts")) {
+        localStorage.setItem("ai_hosp_appts", JSON.stringify(initialAppointments));
+      }
+    }
+
+    function getDoctors() { return JSON.parse(localStorage.getItem("ai_hosp_doctors")) || []; }
+    function getDepartments() { return JSON.parse(localStorage.getItem("ai_hosp_depts")) || []; }
+    function getAppointments() { return JSON.parse(localStorage.getItem("ai_hosp_appts")) || []; }
+
+    function saveAppointments(appts) {
+      localStorage.setItem("ai_hosp_appts", JSON.stringify(appts));
+      renderDashboards();
+    }
+
+    // VIEW SWITCHING LOGIC
+    function switchView(viewId) {
+      document.querySelectorAll('.page-view').forEach(view => view.classList.remove('active'));
+      const target = document.getElementById(`view-${viewId}`);
+      if (target) target.classList.add('active');
+
+      // Update navbar links
+      document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+      const activeNav = document.getElementById(`nav-${viewId}`);
+      if (activeNav) activeNav.classList.add('active');
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    let activeRole = 'patient';
+
+    function switchDashboard(role) {
+      activeRole = role;
+      switchView('dashboards');
+
+      // Hide all panels
+      document.querySelectorAll('.dash-panel').forEach(p => p.classList.add('d-none'));
+
+      // Configure Dashboard Role context
+      const badge = document.getElementById('dash-user-badge');
+      const uname = document.getElementById('dash-user-name');
+      const sidebar = document.getElementById('sidebar-links');
+
+      if (role === 'patient') {
+        badge.textContent = "Patient Portal";
+        badge.className = "badge bg-info px-3 py-2 text-white mb-2";
+        uname.textContent = "Sok Visal";
+        sidebar.innerHTML = `
+          <a href="#" class="sidebar-link active" onclick="switchDashboard('patient')"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
+          <a href="#" class="sidebar-link" onclick="switchView('doctors')"><i class="fa-solid fa-user-md"></i> Find Doctor</a>
+          <a href="#" class="sidebar-link" onclick="switchView('appointment')"><i class="fa-solid fa-calendar-plus"></i> Book Visit</a>
+          <a href="#" class="sidebar-link" onclick="switchView('home')"><i class="fa-solid fa-right-from-bracket"></i> Exit Portal</a>
+        `;
+        document.getElementById('dash-content-patient').classList.remove('d-none');
+      } else if (role === 'doctor') {
+        badge.textContent = "Doctor Portal";
+        badge.className = "badge bg-primary px-3 py-2 text-white mb-2";
+        uname.textContent = "Dr. Sok Dara";
+        sidebar.innerHTML = `
+          <a href="#" class="sidebar-link active" onclick="switchDashboard('doctor')"><i class="fa-solid fa-stethoscope"></i> Appointments</a>
+          <a href="#" class="sidebar-link" onclick="switchDashboard('doctor')"><i class="fa-solid fa-users"></i> Patient List</a>
+          <a href="#" class="sidebar-link" onclick="switchView('home')"><i class="fa-solid fa-right-from-bracket"></i> Exit Portal</a>
+        `;
+        document.getElementById('dash-content-doctor').classList.remove('d-none');
+      } else if (role === 'admin') {
+        badge.textContent = "Admin Control";
+        badge.className = "badge bg-warning text-dark px-3 py-2 mb-2";
+        uname.textContent = "System Administrator";
+        sidebar.innerHTML = `
+          <a href="#" class="sidebar-link active" onclick="switchDashboard('admin')"><i class="fa-solid fa-gauge"></i> Overview</a>
+          <a href="#" class="sidebar-link" onclick="switchDashboard('admin')"><i class="fa-solid fa-user-doctor"></i> Manage Doctors</a>
+          <a href="#" class="sidebar-link" onclick="switchDashboard('admin')"><i class="fa-solid fa-hospital-user"></i> Manage Patients</a>
+          <a href="#" class="sidebar-link" onclick="switchView('home')"><i class="fa-solid fa-right-from-bracket"></i> Exit Portal</a>
+        `;
+        document.getElementById('dash-content-admin').classList.remove('d-none');
+        setTimeout(renderAdminCharts, 100);
+      }
+
+      renderDashboards();
+    }
+
+    function handleLoginSubmit(e) {
+      e.preventDefault();
+      const role = document.getElementById('login-role-select').value;
+      switchDashboard(role);
+    }
+
+    // RENDER DEPARTMENTS
+    function renderDepartments() {
+      const container = document.getElementById('departments-grid');
+      const depts = getDepartments();
+      container.innerHTML = depts.map(d => `
+        <div class="col-md-6 col-lg-3">
+          <div class="card card-custom p-4 text-center h-100">
+            <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center mx-auto mb-3 text-teal" style="width:64px; height:64px;">
+              <i class="fa-solid ${d.icon} fs-3" style="color:var(--primary-teal);"></i>
+            </div>
+            <h5 class="fw-bold mb-2">${d.name}</h5>
+            <p class="text-muted fs-sm mb-3">${d.desc}</p>
+            <button class="btn btn-sm btn-outline-navy mt-auto" onclick="filterByDept('${d.name}')">View Doctors</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // RENDER DOCTORS DIRECTORY
+    function renderDoctors(doctorsToRender = null) {
+      const docs = doctorsToRender || getDoctors();
+      const container = document.getElementById('doctors-grid');
+
+      container.innerHTML = docs.map(doc => `
+        <div class="col-md-6 col-lg-4">
+          <div class="card card-custom h-100 overflow-hidden">
+            <img src="${doc.photo}" class="card-img-top" alt="${doc.name}" style="height: 220px; object-fit: cover;" />
+            <div class="card-body p-4 d-flex flex-column">
+              <span class="badge bg-light text-navy border align-self-start mb-2">${doc.department}</span>
+              <h5 class="fw-bold mb-1">${doc.name}</h5>
+              <p class="text-teal fw-semibold fs-sm mb-2" style="color:var(--primary-teal);">${doc.specialty}</p>
+              <div class="fs-xs text-muted mb-3">
+                <div><i class="fa-solid fa-briefcase me-1"></i> ${doc.experience} Experience</div>
+                <div><i class="fa-solid fa-circle-check text-success me-1"></i> ${doc.availability}</div>
+              </div>
+              <div class="mt-auto d-flex gap-2">
+                <button class="btn btn-sm btn-outline-navy flex-fill" onclick="openDoctorModal(${doc.id})">Profile</button>
+                <button class="btn btn-sm btn-teal flex-fill" onclick="preselectBooking('${doc.department}', '${doc.name}')">Book Visit</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function filterByDept(deptName) {
+      switchView('doctors');
+      document.getElementById('doctor-dept-filter').value = deptName;
+      filterDoctors();
+    }
+
+    function filterDoctors() {
+      const search = document.getElementById('doctor-search-input').value.toLowerCase();
+      const dept = document.getElementById('doctor-dept-filter').value;
+      
+      const filtered = getDoctors().filter(doc => {
+        const matchesSearch = doc.name.toLowerCase().includes(search) || doc.specialty.toLowerCase().includes(search);
+        const matchesDept = (dept === 'all') || (doc.department === dept);
+        return matchesSearch && matchesDept;
+      });
+
+      renderDoctors(filtered);
+    }
+
+    function openDoctorModal(docId) {
+      const doc = getDoctors().find(d => d.id === docId);
+      if (!doc) return;
+
+      document.getElementById('doc-modal-title').textContent = doc.name;
+      document.getElementById('doc-modal-body').innerHTML = `
+        <div class="row align-items-center g-4">
+          <div class="col-md-5 text-center">
+            <img src="${doc.photo}" class="img-fluid rounded-4 shadow" style="max-height: 250px; object-fit: cover;" />
+          </div>
+          <div class="col-md-7">
+            <span class="badge bg-teal text-white mb-2">${doc.department}</span>
+            <h4 class="fw-bold mb-1">${doc.name}</h4>
+            <p class="text-teal fw-semibold mb-3">${doc.specialty}</p>
+            <p class="mb-1"><strong>Experience:</strong> ${doc.experience}</p>
+            <p class="mb-1"><strong>Education:</strong> ${doc.education}</p>
+            <p class="mb-1"><strong>Languages:</strong> ${doc.languages}</p>
+            <p class="mb-3"><strong>Status:</strong> <span class="badge bg-success">${doc.availability}</span></p>
+            <button class="btn btn-teal" onclick="bootstrap.Modal.getInstance(document.getElementById('doctorDetailModal')).hide(); preselectBooking('${doc.department}', '${doc.name}');">Book Appointment</button>
+          </div>
+        </div>
+      `;
+
+      new bootstrap.Modal(document.getElementById('doctorDetailModal')).show();
+    }
+
+    function populateBookingDropdowns() {
+      const deptSelect = document.getElementById('book-dept-select');
+      const depts = getDepartments();
+      
+      deptSelect.innerHTML = '<option value="">Choose Department...</option>' + 
+        depts.map(d => `<option value="${d.name}">${d.name}</option>`).join('');
+
+      // Set default date to today
+      document.getElementById('book-date').value = new Date().toISOString().split('T')[0];
+    }
+
+    function updateDoctorDropdown() {
+      const dept = document.getElementById('book-dept-select').value;
+      const docSelect = document.getElementById('book-doctor-select');
+      const docs = getDoctors().filter(d => !dept || d.department === dept);
+
+      docSelect.innerHTML = '<option value="">Choose Doctor...</option>' + 
+        docs.map(d => `<option value="${d.name}">${d.name} (${d.specialty})</option>`).join('');
+    }
+
+    function preselectBooking(dept, docName) {
+      switchView('appointment');
+      document.getElementById('book-dept-select').value = dept;
+      updateDoctorDropdown();
+      document.getElementById('book-doctor-select').value = docName;
+    }
+
+    function handleAppointmentSubmit(e) {
+      e.preventDefault();
+      const patientName = document.getElementById('book-patient-name').value;
+      const patientEmail = document.getElementById('book-patient-email').value;
+      const dept = document.getElementById('book-dept-select').value;
+      const docName = document.getElementById('book-doctor-select').value;
+      const date = document.getElementById('book-date').value;
+      const time = document.getElementById('book-time-select').value;
+      const reason = document.getElementById('book-reason').value;
+
+      const newAppt = {
+        id: "APT-" + Math.floor(1000 + Math.random() * 9000),
+        patientName,
+        patientEmail,
+        doctorName: docName,
+        department: dept,
+        date,
+        time,
+        reason: reason || "General Consultation",
+        status: "Pending"
+      };
+
+      const appts = getAppointments();
+      appts.unshift(newAppt);
+      saveAppointments(appts);
+
+      // Display Confirmation UI
+      document.getElementById('booking-form').classList.add('d-none');
+      document.getElementById('conf-id').textContent = newAppt.id;
+      document.getElementById('conf-doctor').textContent = newAppt.doctorName;
+      document.getElementById('conf-datetime').textContent = `${newAppt.date} | ${newAppt.time}`;
+      document.getElementById('booking-confirmation-card').classList.remove('d-none');
+    }
+
+    function resetBookingForm() {
+      document.getElementById('booking-form').reset();
+      document.getElementById('booking-form').classList.remove('d-none');
+      document.getElementById('booking-confirmation-card').classList.add('d-none');
+    }
+
+    function renderDashboards() {
+      const appts = getAppointments();
+
+      // PATIENT DASHBOARD
+      const patAppts = appts;
+      document.getElementById('pat-stat-upcoming').textContent = patAppts.filter(a => a.status === 'Pending' || a.status === 'Confirmed').length;
+      document.getElementById('pat-stat-completed').textContent = patAppts.filter(a => a.status === 'Completed').length;
+      document.getElementById('pat-stat-cancelled').textContent = patAppts.filter(a => a.status === 'Cancelled').length;
+
+      document.getElementById('patient-appts-tbody').innerHTML = patAppts.map(a => `
+        <tr>
+          <td><span class="fw-bold">${a.id}</span></td>
+          <td>${a.doctorName}</td>
+          <td>${a.department}</td>
+          <td><small>${a.date}<br>${a.time}</small></td>
+          <td><span class="badge badge-${a.status.toLowerCase()}">${a.status}</span></td>
+          <td>
+            ${a.status !== 'Cancelled' ? `<button class="btn btn-xs btn-outline-danger" onclick="updateApptStatus('${a.id}', 'Cancelled')">Cancel</button>` : '<span class="text-muted fs-xs">None</span>'}
+          </td>
+        </tr>
+      `).join('');
+
+      // DOCTOR DASHBOARD
+      document.getElementById('doc-stat-today').textContent = appts.length;
+      document.getElementById('doc-stat-pending').textContent = appts.filter(a => a.status === 'Pending').length;
+      document.getElementById('doc-stat-confirmed').textContent = appts.filter(a => a.status === 'Confirmed').length;
+      document.getElementById('doc-stat-completed').textContent = appts.filter(a => a.status === 'Completed').length;
+
+      document.getElementById('doctor-appts-tbody').innerHTML = appts.map(a => `
+        <tr>
+          <td><strong>${a.patientName}</strong><br><small class="text-muted">${a.patientEmail}</small></td>
+          <td><small>${a.date}<br>${a.time}</small></td>
+          <td><span class="fs-xs">${a.reason}</span></td>
+          <td><span class="badge badge-${a.status.toLowerCase()}">${a.status}</span></td>
+          <td>
+            <div class="btn-group btn-group-sm">
+              <button class="btn btn-success" onclick="updateApptStatus('${a.id}', 'Confirmed')" title="Confirm"><i class="fa-solid fa-check"></i></button>
+              <button class="btn btn-danger" onclick="updateApptStatus('${a.id}', 'Cancelled')" title="Cancel"><i class="fa-solid fa-xmark"></i></button>
+              <button class="btn btn-primary" onclick="updateApptStatus('${a.id}', 'Completed')" title="Mark Done"><i class="fa-solid fa-flag-checkered"></i></button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+
+      // ADMIN DASHBOARD
+      document.getElementById('admin-stat-appts').textContent = appts.length;
+      document.getElementById('admin-stat-doctors').textContent = getDoctors().length;
+
+      document.getElementById('admin-appts-tbody').innerHTML = appts.map(a => `
+        <tr>
+          <td><strong>${a.id}</strong></td>
+          <td>${a.patientName}</td>
+          <td>${a.doctorName}</td>
+          <td>${a.department}</td>
+          <td><small>${a.date} | ${a.time}</small></td>
+          <td><span class="badge badge-${a.status.toLowerCase()}">${a.status}</span></td>
+          <td>
+            <button class="btn btn-xs btn-outline-danger" onclick="deleteAppointment('${a.id}')"><i class="fa-solid fa-trash"></i> Delete</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function updateApptStatus(id, newStatus) {
+      const appts = getAppointments();
+      const appt = appts.find(a => a.id === id);
+      if (appt) {
+        appt.status = newStatus;
+        saveAppointments(appts);
+      }
+    }
+
+    function deleteAppointment(id) {
+      let appts = getAppointments();
+      appts = appts.filter(a => a.id !== id);
+      saveAppointments(appts);
+    }
+
+    // Admin Doctor Add
+    function openAddDoctorModal() {
+      new bootstrap.Modal(document.getElementById('addDoctorModal')).show();
+    }
+
+    function handleAddDoctor(e) {
+      e.preventDefault();
+      const name = document.getElementById('admin-doc-name').value;
+      const dept = document.getElementById('admin-doc-dept').value;
+      const spec = document.getElementById('admin-doc-spec').value;
+      const exp = document.getElementById('admin-doc-exp').value;
+
+      const docs = getDoctors();
+      docs.push({
+        id: Date.now(),
+        name,
+        department: dept,
+        specialty: spec,
+        experience: exp,
+        availability: "Available",
+        education: "MD Specialist",
+        languages: "English",
+        photo: "https://images.unsplash.com/photo-1537368910025-700350fe46c7?auto=format&fit=crop&w=400&q=80"
+      });
+
+      localStorage.setItem("ai_hosp_doctors", JSON.stringify(docs));
+      bootstrap.Modal.getInstance(document.getElementById('addDoctorModal')).hide();
+      renderDoctors();
+      renderDashboards();
+    }
+
+    let deptChartInstance = null;
+    let statusChartInstance = null;
+
+    function renderAdminCharts() {
+      const appts = getAppointments();
+
+      // Dept distribution map
+      const deptCounts = {};
+      appts.forEach(a => { deptCounts[a.department] = (deptCounts[a.department] || 0) + 1; });
+
+      const deptCtx = document.getElementById('chart-depts');
+      if (deptCtx) {
+        if (deptChartInstance) deptChartInstance.destroy();
+        deptChartInstance = new Chart(deptCtx, {
+          type: 'bar',
+          data: {
+            labels: Object.keys(deptCounts).length ? Object.keys(deptCounts) : ['Cardiology', 'Neurology'],
+            datasets: [{
+              label: 'Bookings',
+              data: Object.values(deptCounts).length ? Object.values(deptCounts) : [1, 1],
+              backgroundColor: '#00a896'
+            }]
+          },
+          options: { responsive: true, plugins: { legend: { display: false } } }
+        });
+      }
+
+      // Status breakdown chart
+      const statusCounts = { Pending: 0, Confirmed: 0, Cancelled: 0, Completed: 0 };
+      appts.forEach(a => { if (statusCounts[a.status] !== undefined) statusCounts[a.status]++; });
+
+      const statusCtx = document.getElementById('chart-status');
+      if (statusCtx) {
+        if (statusChartInstance) statusChartInstance.destroy();
+        statusChartInstance = new Chart(statusCtx, {
+          type: 'doughnut',
+          data: {
+            labels: ['Pending', 'Confirmed', 'Cancelled', 'Completed'],
+            datasets: [{
+              data: [statusCounts.Pending, statusCounts.Confirmed, statusCounts.Cancelled, statusCounts.Completed],
+              backgroundColor: ['#ffc107', '#0d6efd', '#dc3545', '#198754']
+            }]
+          },
+          options: { responsive: true }
+        });
+      }
+    }
+
+    function toggleAIChat() {
+      const win = document.getElementById('ai-chat-window');
+      win.style.display = (win.style.display === 'flex') ? 'none' : 'flex';
+    }
+
+    function sendQuickPill(text) {
+      appendChatMessage(text, 'user');
+      processAIBotResponse(text);
+    }
+
+    function handleAIType(e) {
+      if (e.key === 'Enter') sendAIMessage();
+    }
+
+    function sendAIMessage() {
+      const input = document.getElementById('ai-chat-input');
+      const text = input.value.trim();
+      if (!text) return;
+      
+      appendChatMessage(text, 'user');
+      input.value = '';
+      processAIBotResponse(text);
+    }
+
+    function appendChatMessage(text, sender) {
+      const body = document.getElementById('ai-chat-body');
+      const bubble = document.createElement('div');
+      bubble.className = `chat-bubble chat-bubble-${sender}`;
+      bubble.innerHTML = text;
+      body.appendChild(bubble);
+      body.scrollTop = body.scrollHeight;
+    }
+
+    function processAIBotResponse(query) {
+      const q = query.toLowerCase();
+
+      setTimeout(() => {
+        if (q.includes('doctor') || q.includes('find')) {
+          const docs = getDoctors();
+          const docList = docs.map(d => `• <strong>${d.name}</strong> (${d.specialty})`).join('<br>');
+          appendChatMessage(`Here are our available clinical specialists:<br>${docList}<br><br><button class="btn btn-xs btn-teal mt-1" onclick="switchView('doctors'); toggleAIChat();">View Doctor Directory</button>`, 'bot');
+        } else if (q.includes('avail') || q.includes('schedule')) {
+          appendChatMessage(`Our specialists are available Monday - Friday, 08:00 AM - 04:30 PM. Would you like to check a specific doctor?`, 'bot');
+        } else if (q.includes('book') || q.includes('appointment')) {
+          appendChatMessage(`You can book an appointment directly through our online form!<br><br><button class="btn btn-xs btn-teal mt-1" onclick="switchView('appointment'); toggleAIChat();">Open Booking Form</button>`, 'bot');
+        } else if (q.includes('info') || q.includes('hospital')) {
+          appendChatMessage(`🏥 <strong>AI Health Hospital</strong><br>Monivong Blvd, Phnom Penh<br>📞 Emergency: +855 23 888 999<br>✉️ Email: info@aihealthhospital.com`, 'bot');
+        } else {
+          appendChatMessage(`I can help you find doctors, check department schedules, or complete an appointment booking. What would you like to do?`, 'bot');
+        }
+      }, 600);
+    }
+
+    function openArchModal() {
+      new bootstrap.Modal(document.getElementById('archModal')).show();
+    }
+
+    /* INITIALIZATION ON WINDOW LOAD */
+    window.onload = function() {
+      initData();
+      renderDepartments();
+      renderDoctors();
+      populateBookingDropdowns();
+      renderDashboards();
+    };
+  </script>
+</body>
+</html>
